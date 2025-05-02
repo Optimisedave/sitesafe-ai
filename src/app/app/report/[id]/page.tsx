@@ -1,0 +1,52 @@
+
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+import ReportDisplay from "./report-display"; // Client component for interactivity
+
+async function getReportData(reportId: string, userId: string) {
+  const report = await prisma.report.findUnique({
+    where: {
+      id: reportId,
+      // Ensure user can only access their own reports
+      userId: userId,
+    },
+    select: {
+      id: true,
+      title: true,
+      summary: true,
+      fullReportMarkdown: true,
+      riskFlags: true,
+      createdAt: true,
+      sourceUploadIds: true, // Include source uploads if needed
+    },
+  });
+  return report;
+}
+
+export default async function ReportPage({ params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user?.id) {
+    redirect("/api/auth/signin");
+  }
+
+  const userId = session.user.id;
+  const reportId = params.id;
+
+  const report = await getReportData(reportId, userId);
+
+  if (!report) {
+    // Handle report not found or not authorized
+    return (
+      <div className="min-h-screen bg-gray-100 p-8 flex items-center justify-center">
+        <p className="text-red-600">Report not found or you do not have permission to view it.</p>
+      </div>
+    );
+  }
+
+  // Pass data to a client component for rendering Markdown and handling PDF export
+  return <ReportDisplay report={report} />;
+}
+

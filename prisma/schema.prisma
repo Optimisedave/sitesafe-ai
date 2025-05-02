@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Points to Supabase Postgres
+}
+
+enum Role {
+  MEMBER
+  ADMIN // Added ADMIN role for potential future use, though not strictly in MVP brief
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELED
+  TRIALING
+}
+
+model User {
+  id               String         @id @default(cuid())
+  email            String         @unique
+  role             Role           @default(MEMBER)
+  stripeCustomerId String?        @unique // Added unique constraint as per Stripe best practices
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  subscriptions    Subscription[]
+  uploads          Upload[]
+  reports          Report[]
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  userId           String
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete
+  stripeSubscriptionId String         @unique // Added Stripe Subscription ID
+  stripePriceId    String             // Added Stripe Price ID
+  status           SubscriptionStatus
+  currentPeriodEnd DateTime
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model Upload {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete
+  filename  String
+  storagePath String // Using storagePath instead of direct URL for security/flexibility
+  filetype  String   // Added filetype (e.g., 'pdf', 'jpg', 'txt')
+  status    String   @default("PENDING") // Added status for processing queue (PENDING, PROCESSING, COMPLETED, FAILED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Report {
+  id                 String   @id @default(cuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete
+  title              String   // e.g., "Site Report - Project X - 2025-05-02"
+  summary            String   @db.Text // Use Text for potentially longer summaries
+  fullReportMarkdown String   @db.Text // Use Text for markdown report
+  riskFlags          Json     // Store flagged risks as JSON
+  sourceUploadIds    String[] // Link back to source uploads
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
