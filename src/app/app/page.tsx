@@ -53,7 +53,8 @@ export default async function DashboardPage() {
           </div>
 
           {reports.length === 0 ? (
-            <p className="text-gray-600">You haven't generated any reports yet. Upload a file to get started!</p>
+            // Fixed unescaped apostrophe
+            <p className="text-gray-600">You haven&apos;t generated any reports yet. Upload a file to get started!</p>
           ) : (
             <ul className="space-y-4">
               {reports.map((report) => (

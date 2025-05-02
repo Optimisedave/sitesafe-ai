@@ -1,157 +1,222 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+// Removed unused Font, Report, SubscriptionStatus imports
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer'; 
+import { Prisma } from '@prisma/client'; // Import Prisma namespace for JsonValue
 
-// Define the expected shape of the report prop
-interface ReportData {
-  id: string;
-  title: string;
-  summary: string;
-  fullReportMarkdown: string;
-  riskFlags: any; // Adjust type based on actual JSON structure
-  createdAt: Date;
-}
-
+// Define a more specific type for the report prop, including riskFlags as JsonValue
 interface ReportDisplayProps {
-  report: ReportData;
+  report: {
+    id: string;
+    title: string;
+    summary: string;
+    fullReportMarkdown: string;
+    riskFlags: Prisma.JsonValue; // Use Prisma.JsonValue
+    createdAt: Date;
+    sourceUploadIds: string[];
+  };
 }
 
-// Basic styles for PDF document
-const pdfStyles = StyleSheet.create({
+// Define the structure for RiskFlag based on how it's stored/used
+interface RiskFlag {
+  description: string;
+  severity: 'Low' | 'Medium' | 'High';
+}
+
+// Register fonts (ensure these paths are correct in the environment)
+// Font.register({
+//   family: 'NotoSansCJK',
+//   src: '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+// });
+// Font.register({
+//   family: 'WenQuanYiZenHei',
+//   src: '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc'
+// });
+
+// Create styles for PDF
+const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 30,
+    // fontFamily: 'NotoSansCJK', // Apply font if registered
+    fontFamily: 'Helvetica', // Default fallback
   },
   section: {
     marginBottom: 10,
   },
   heading: {
     fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 10,
-    fontWeight: 'bold',
+    color: '#1E40AF', // Blue-700
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  summary: {
-    fontSize: 12,
-    marginBottom: 15,
-    fontStyle: 'italic',
-  },
-  markdownContent: {
-    fontSize: 11,
-    lineHeight: 1.4,
-  },
-  riskSection: {
-    marginTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
-    paddingTop: 10,
-  },
-  riskTitle: {
+  subheading: {
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#1D4ED8', // Blue-600
+  },
+  paragraph: {
+    fontSize: 11,
+    marginBottom: 8,
+    lineHeight: 1.4,
+    color: '#374151', // Gray-700
+  },
+  listItem: {
+    fontSize: 11,
+    marginBottom: 4,
+    marginLeft: 10,
   },
   riskItem: {
     fontSize: 11,
-    marginBottom: 3,
+    marginBottom: 6,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB', // Gray-200
+    borderRadius: 4,
+  },
+  riskDescription: {
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  riskSeverityHigh: {
+    color: '#DC2626', // Red-600
+  },
+  riskSeverityMedium: {
+    color: '#F59E0B', // Amber-500
+  },
+  riskSeverityLow: {
+    color: '#6B7280', // Gray-500
   },
 });
 
-// Component to generate the PDF document structure
-const ReportPDF = ({ report }: { report: ReportData }) => (
-  <Document>
-    <Page size="A4" style={pdfStyles.page}>
-      <View style={pdfStyles.section}>
-        <Text style={pdfStyles.title}>{report.title}</Text>
-        <Text style={pdfStyles.summary}>Summary: {report.summary}</Text>
-        <Text style={pdfStyles.summary}>Generated: {new Date(report.createdAt).toLocaleDateString()}</Text>
-      </View>
-      
-      {/* Basic rendering of Markdown - @react-pdf/renderer doesn't support complex Markdown directly */}
-      {/* For a real app, you'd need a Markdown-to-PDF conversion or simpler text rendering */}
-      <View style={pdfStyles.section}>
-         <Text style={pdfStyles.heading}>Full Report</Text>
-         {/* Split markdown into paragraphs for basic rendering */} 
-         {report.fullReportMarkdown.split('\n\n').map((paragraph, index) => (
-            <Text key={index} style={pdfStyles.markdownContent}>{paragraph.replace(/\*\*/g, '')}</Text> // Basic bold removal
-         ))}
-      </View>
+// Component to render the PDF document
+const ReportPDF = ({ report }: ReportDisplayProps) => {
+  // Safely parse riskFlags, assuming it's an array of RiskFlag objects
+  const riskFlags = (Array.isArray(report.riskFlags) ? report.riskFlags : []) as RiskFlag[];
 
-      {report.riskFlags && report.riskFlags.length > 0 && (
-        <View style={pdfStyles.riskSection}>
-          <Text style={pdfStyles.riskTitle}>Identified Risks:</Text>
-          {report.riskFlags.map((risk: any, index: number) => (
-            <Text key={index} style={pdfStyles.riskItem}>
-              - {risk.description} (Severity: {risk.severity})
-            </Text>
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.heading}>{report.title}</Text>
+          <Text style={[styles.paragraph, { fontSize: 9, color: '#6B7280' }]}>
+            Generated: {new Date(report.createdAt).toLocaleDateString()}
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.subheading}>Summary</Text>
+          <Text style={styles.paragraph}>{report.summary}</Text>
+        </View>
+
+        {riskFlags.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.subheading}>Identified Risks</Text>
+            {riskFlags.map((risk, index) => (
+              <View key={index} style={styles.riskItem}>
+                <Text style={styles.riskDescription}>{risk.description}</Text>
+                <Text
+                  style={[
+                    risk.severity === 'High' ? styles.riskSeverityHigh :
+                    risk.severity === 'Medium' ? styles.riskSeverityMedium :
+                    styles.riskSeverityLow,
+                    { fontSize: 10 }
+                  ]}
+                >
+                  Severity: {risk.severity}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={styles.section}>
+          <Text style={styles.subheading}>Full Report Details</Text>
+          {/* Basic rendering of Markdown - consider a more robust parser if needed */}
+          {report.fullReportMarkdown.split('\n').map((line, index) => (
+            <Text key={index} style={styles.paragraph}>{line}</Text>
           ))}
         </View>
-      )}
-    </Page>
-  </Document>
-);
+      </Page>
+    </Document>
+  );
+};
 
-export default function ReportDisplay({ report }: ReportDisplayProps) {
+// Main display component
+const ReportDisplay = ({ report }: ReportDisplayProps) => {
+  const [isClient, setIsClient] = useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Safely parse riskFlags for display
+  const riskFlags = (Array.isArray(report.riskFlags) ? report.riskFlags : []) as RiskFlag[];
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
       <header className="mb-8 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900 truncate">{report.title}</h1>
-        {/* PDF Download Link - Renders client-side */}
-        <PDFDownloadLink 
-          document={<ReportPDF report={report} />} 
-          fileName={`${report.title.replace(/\s+/g, '_')}.pdf`}
-        >
-          {({ blob, url, loading, error }) => 
-            loading ? 'Loading document...' : 
-            <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-              Download PDF
-            </button>
-          }
-        </PDFDownloadLink>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 truncate">{report.title}</h1>
+        {isClient && (
+          <PDFDownloadLink
+            document={<ReportPDF report={report} />}
+            fileName={`${report.title.replace(/\s+/g, '_')}_${new Date(report.createdAt).toISOString().split('T')[0]}.pdf`}
+          >
+            {({ loading }) => (
+              <button
+                className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                {loading ? 'Generating PDF...' : 'Download PDF'}
+              </button>
+            )}
+          </PDFDownloadLink>
+        )}
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Main Report Content */}
-        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-semibold mb-4">Report Details</h2>
-          <article className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {report.fullReportMarkdown}
-            </ReactMarkdown>
-          </article>
-        </div>
+      {/* Summary Section */}
+      <div className="bg-white p-6 rounded-lg shadow mb-8">
+        <h2 className="text-xl font-semibold mb-3">Summary</h2>
+        <p className="text-gray-700">{report.summary}</p>
+      </div>
 
-        {/* Sidebar for Summary & Risks */}
-        <div className="md:col-span-1 bg-white p-6 rounded-lg shadow h-fit sticky top-8">
-          <h2 className="text-xl font-semibold mb-4">Summary</h2>
-          <p className="text-gray-700 mb-6 text-sm">{report.summary}</p>
-          
-          <h2 className="text-xl font-semibold mb-4">Risk Flags</h2>
-          {report.riskFlags && report.riskFlags.length > 0 ? (
-            <ul className="space-y-2">
-              {report.riskFlags.map((risk: any, index: number) => (
-                <li key={index} className={`border-l-4 p-2 rounded-r-md ${risk.severity === 'High' ? 'border-red-500 bg-red-50' : risk.severity === 'Medium' ? 'border-yellow-500 bg-yellow-50' : 'border-gray-400 bg-gray-50'}`}>
-                  <p className="font-medium text-sm">{risk.description}</p>
-                  <p className="text-xs text-gray-600">Severity: {risk.severity}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-600 text-sm">No specific risks flagged in this report.</p>
-          )}
+      {/* Risk Flags Section */}
+      {riskFlags.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow mb-8">
+          <h2 className="text-xl font-semibold mb-4">Identified Risks</h2>
+          <ul className="space-y-3">
+            {riskFlags.map((risk, index) => (
+              <li key={index} className="border border-gray-200 p-3 rounded-md">
+                <p className="font-medium text-gray-800 mb-1">{risk.description}</p>
+                <span
+                  className={`text-sm font-semibold px-2 py-0.5 rounded ${risk.severity === 'High' ? 'bg-red-100 text-red-700' : risk.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  {risk.severity}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
+      )}
+
+      {/* Full Report Markdown Section */}
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-4">Full Report Details</h2>
+        <article className="prose prose-sm max-w-none">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {report.fullReportMarkdown}
+          </ReactMarkdown>
+        </article>
       </div>
     </div>
   );
-}
+};
+
+export default ReportDisplay;
 

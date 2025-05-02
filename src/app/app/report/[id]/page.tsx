@@ -1,9 +1,9 @@
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth"; // Updated import
+import { authOptions } from "@/lib/auth"; // Reverted to extensionless path alias
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
-import ReportDisplay from "./report-display"; // Client component for interactivity
+import prisma from "@/lib/prisma"; // Reverted to extensionless path alias
+import ReportDisplay from "./report-display.tsx"; // Relative import needs extension
 
 async function getReportData(reportId: string, userId: string) {
   const report = await prisma.report.findUnique({
@@ -25,6 +25,7 @@ async function getReportData(reportId: string, userId: string) {
   return report;
 }
 
+// Reverted to the standard Next.js App Router signature for page props
 export default async function ReportPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
@@ -48,6 +49,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
   }
 
   // Pass data to a client component for rendering Markdown and handling PDF export
+  // Ensure the ReportDisplay component expects the correct report type
   return <ReportDisplay report={report} />;
 }
 
