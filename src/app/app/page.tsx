@@ -1,6 +1,6 @@
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth"; // Updated import
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -23,7 +23,8 @@ async function getUserReports(userId: string) {
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.id) {
+  // Use optional chaining for session user properties
+  if (!session?.user?.id) {
     redirect("/api/auth/signin"); // Redirect to sign-in if not authenticated
   }
 

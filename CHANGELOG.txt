@@ -1,0 +1,23 @@
+## CHANGELOG - 2025-05-02
+
+This update addresses build errors encountered during Vercel deployment.
+
+### Added Files
+
+*   `src/lib/auth.ts`: Centralized NextAuth configuration options.
+
+### Edited Files
+
+*   `src/app/api/auth/[...nextauth]/route.ts`: Updated to import `authOptions` from `src/lib/auth.ts`.
+*   `src/lib/prisma.ts`: Ensured correct singleton pattern for Prisma client (no functional change, but reviewed).
+*   `src/app/api/stripe/create-session/route.ts`: Updated to import `authOptions` and `prisma` from `src/lib/`.
+*   `src/app/api/stripe/webhook/route.ts`: Updated to import `prisma` from `src/lib/prisma.ts`.
+*   `src/app/api/upload/route.ts`: Updated to import `authOptions` and `prisma` from `src/lib/`.
+*   `src/app/app/page.tsx`: Updated to import `authOptions` from `src/lib/auth.ts`.
+*   `src/app/app/report/[id]/page.tsx`: Updated to import `authOptions` from `src/lib/auth.ts`.
+*   `src/lib/auth.ts`: Corrected syntax errors in `pages` and `debug` properties within `authOptions`.
+*   `src/app/layout.tsx`: No functional change, but verified Geist font import.
+*   `package.json` / `package-lock.json`: Added `geist` dependency to resolve font import error.
+
+**Note:** The `next build` command now completes successfully, but ESLint shows several warnings (e.g., usage of `any` type, unused variables). These do not prevent the build but should be addressed for code quality improvements.
+
