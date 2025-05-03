@@ -1,9 +1,9 @@
 
 import { getServerSession } from "next-auth/next";
-// Changed imports to relative paths (Option B) - Re-verified for v6
-import { authOptions } from "../../lib/auth"; 
+// Restored alias imports (Option A) for v7
+import { authOptions } from "@/lib/auth"; 
 import { redirect } from "next/navigation";
-import prisma from "../../lib/prisma";
+import prisma from "@/lib/prisma";
 import Link from "next/link";
 
 // Helper function to fetch reports - could be moved to a service/lib file
