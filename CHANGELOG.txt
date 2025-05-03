@@ -76,3 +76,11 @@ This update addressed Vercel build failures related to module resolution, ESLint
 **Build Status (v2):**
 - `npm run build` failed with persistent `PageProps` type error in `src/app/app/report/[id]/page.tsx`.
 
+
+
+
+### v4 (2025-05-03)
+
+*   **Fix:** Inlined `src/lib/auth.ts`, `src/lib/prisma.ts`, `src/lib/supabase.ts`, `src/lib/stripe.ts`, and `src/lib/openai.ts` logic directly into the respective API route files (`src/app/api/**/route.ts`) to bypass persistent module resolution errors during the build process. Original lib files remain but are no longer imported by API routes.
+*   **Fix:** Ensured critical files (`src/lib/auth.ts`, `src/lib/prisma.ts`, `src/app/globals.css`) are present (though lib files are now effectively unused by API routes due to inlining).
+
