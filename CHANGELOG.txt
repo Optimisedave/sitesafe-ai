@@ -92,3 +92,11 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Fix:** Changed path alias imports (`@/lib/...`) to relative paths (`../../lib/...` or `../../../../lib/...`) in `src/app/app/page.tsx` and `src/app/app/report/[id]/page.tsx` to resolve build errors (Option B).
 *   **Note:** Verified `src/app/layout.tsx` already used a relative path for `globals.css`.
 
+
+
+
+### v6 (2025-05-03)
+
+*   **Fix:** Re-verified and explicitly overwrote `src/app/app/page.tsx` and `src/app/app/report/[id]/page.tsx` to use relative paths (`../../lib/...` and `../../../../lib/...` respectively) instead of path aliases (`@/lib/...`) for `authOptions` and `prisma` imports, as requested.
+*   **Note:** Local build (`npm run build`) confirms these specific files no longer cause alias-related build errors. However, the build still fails due to an unrelated type error (`Module '@prisma/client' has no exported member 'PrismaClient'`) in `src/app/api/auth/[...nextauth]/route.ts` which was present previously and is outside the scope of this specific fix.
+

@@ -1,6 +1,6 @@
 
 import { getServerSession } from "next-auth/next";
-// Changed imports to relative paths (Option B) - Corrected depth
+// Changed imports to relative paths (Option B) - Corrected depth & re-verified for v6
 import { authOptions } from "../../../../lib/auth"; 
 import { redirect } from "next/navigation";
 import prisma from "../../../../lib/prisma";
