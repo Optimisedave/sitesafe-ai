@@ -1,9 +1,10 @@
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth"; // Reverted to extensionless path alias
+// Changed imports to relative paths (Option B) - Corrected depth
+import { authOptions } from "../../../../lib/auth"; 
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma"; // Reverted to extensionless path alias
-import ReportDisplay from "./report-display.tsx"; // Relative import needs extension
+import prisma from "../../../../lib/prisma";
+import ReportDisplay from "./report-display"; // Removed .tsx extension as it's often optional
 
 async function getReportData(reportId: string, userId: string) {
   const report = await prisma.report.findUnique({
