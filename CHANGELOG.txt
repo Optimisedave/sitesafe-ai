@@ -108,3 +108,12 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Fix:** Implemented Option A: Ensured `src/lib/auth.ts`, `src/lib/prisma.ts`, and `src/app/globals.css` exist. Restored `@/lib/...` alias imports in `src/app/app/page.tsx` and `src/app/app/report/[id]/page.tsx`. Verified `tsconfig.json` alias configuration. Performed clean install (`rm -rf node_modules .next && npm install`) and `npx prisma generate`.
 *   **Note:** Local build (`npm run build`) now compiles successfully, confirming the alias imports in the specified page components are resolved. However, the build still fails during the linting/type-checking phase due to the pre-existing, unrelated type error (`Module '@prisma/client' has no exported member 'PrismaClient'`) in `src/app/api/auth/[...nextauth]/route.ts`. This error is outside the scope of fixing the page component alias imports.
 
+
+
+
+### v8 (2025-05-03)
+
+*   **Fix:** Reverted to Option B due to `compiler.tsconfigPaths` being an invalid option in `next.config.js`. Updated `src/app/app/page.tsx` and `src/app/app/report/[id]/page.tsx` to use relative paths (`../../lib/...` and `../../../../lib/...` respectively) for `authOptions` and `prisma` imports. Verified `src/app/layout.tsx` uses relative path (`./globals.css`) for CSS import.
+*   **Fix:** Removed invalid `compiler.tsconfigPaths` option from `next.config.js`.
+*   **Note:** Performed clean install (`rm -rf node_modules .next && npm install`) and `npx prisma generate`. Local build (`npm run build`) now compiles successfully, confirming the relative imports in the specified page/layout components are resolved. The build still fails during the linting/type-checking phase due to the pre-existing, unrelated type error (`Module '@prisma/client' has no exported member 'PrismaClient'`) in `src/app/api/auth/[...nextauth]/route.ts`.
+

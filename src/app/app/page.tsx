@@ -1,9 +1,9 @@
 
 import { getServerSession } from "next-auth/next";
-// Restored alias imports (Option A) for v7
-import { authOptions } from "@/lib/auth"; 
+// Switched back to relative paths (Option B) for v8 due to tsconfigPaths not being supported
+import { authOptions } from "../../lib/auth"; 
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
+import prisma from "../../lib/prisma";
 import Link from "next/link";
 
 // Helper function to fetch reports - could be moved to a service/lib file
