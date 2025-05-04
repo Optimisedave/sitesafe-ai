@@ -280,3 +280,14 @@ This update addressed Vercel build failures related to module resolution, ESLint
     *   Added comments to `.env.example` and `.env` indicating that `SUPABASE_ANON_KEY` is no longer used by the default client.
 *   **Note:** Local build verification (`npm run build`) confirms that the changes do not introduce new compilation or type errors. The build passes compilation and type-checking, failing later only due to expected missing environment variables (Supabase) in this sandbox environment.
 
+
+
+
+
+### v23 (2025-05-04)
+
+*   **Verification:** Re-verified the Supabase client initialization changes implemented in v22 based on the user's latest request.
+    *   Confirmed `src/lib/supabase.ts` uses `process.env.SUPABASE_SERVICE_KEY!` for client initialization.
+    *   Confirmed `.env.example` and `.env` include `SUPABASE_SERVICE_KEY` and deprecate `SUPABASE_ANON_KEY` with a comment.
+*   **Note:** No code changes were made in this version as the existing implementation from v22 already matched the user's requirements. Local build verification (`npm run build`) confirms the setup works correctly (passing compilation and type-checking, failing later only due to expected missing environment variables).
+
