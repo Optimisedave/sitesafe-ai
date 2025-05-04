@@ -1,4 +1,4 @@
-import NextAuth, { NextAuthOptions } from "next-auth"; // Import only NextAuthOptions from here
+import NextAuth, { NextAuthOptions, DefaultSession } from "next-auth"; // Import DefaultSession
 // Removed User and Session type imports as they cause errors
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import EmailProvider from "next-auth/providers/email";
@@ -29,17 +29,7 @@ if (process.env.NODE_ENV !== "production") global.prismaAuthInstance = prismaAut
 
 // --- Inlined authOptions from src/lib/auth.ts --- 
 
-// Define a custom Session type if needed to include id and role
-// Use a basic object type for Session as the import is problematic
-interface CustomSession extends Record<string, any> { 
-  user?: {
-    id?: string | null;
-    role?: string | null; // Assuming role is a string, adjust if needed
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  };
-}
+// Removed CustomSession interface
 
 // Define authOptions directly in this file, using NextAuthOptions type
 const authOptions: NextAuthOptions = {
@@ -73,14 +63,16 @@ const authOptions: NextAuthOptions = {
     // newUser: 
   },
   callbacks: {
-    // Use AdapterUser or any for user type as User import is problematic
-    async session({ session, user }: { session: CustomSession; user: AdapterUser }): Promise<CustomSession> { 
-      // Add user id and role to the session object
+    // Updated session callback signature and logic as per user suggestion (Option 2)
+    async session({ session, user }: { 
+      session: DefaultSession; 
+      user: AdapterUser; 
+    }): Promise<DefaultSession> { 
+      // Add user id to the session object
+      // Note: DefaultSession['user'] might not have 'id'. We add it dynamically.
       if (session?.user) {
-        session.user.id = user.id;
-        // Cast user to access potential custom properties like role
-        // Ensure your Prisma User model actually has a 'role' field
-        session.user.role = (user as { role?: string | null })?.role ?? null; 
+        (session.user as any).id = user.id;
+        // Role cannot be added directly to DefaultSession.user without extending the type
       }
       return session;
     },

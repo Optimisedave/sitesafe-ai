@@ -205,3 +205,17 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Note:** Verified that `next-env.d.ts` exists and is included in `tsconfig.json`.
 *   **Known Issue:** While the `next/server` module resolution issue is fixed, the build (`npm run build`) now fails with a different type error in `src/app/api/auth/[...nextauth]/route.ts` related to the `CustomSession` type not being assignable to the expected `Session | DefaultSession` type in the `session` callback. This error emerged after changing `moduleResolution` and requires separate investigation.
 
+
+
+
+
+### v17 (2025-05-04)
+
+*   **Fix:** Resolved the `CustomSession` type mismatch error in the `session` callback within `src/app/api/auth/[...nextauth]/route.ts` that emerged in v16.
+    *   Imported `DefaultSession` from `next-auth`.
+    *   Removed the local `CustomSession` interface.
+    *   Updated the `session` callback signature to use `DefaultSession` for the `session` parameter and return type, as suggested by the user.
+    *   Used a type assertion `(session.user as any).id = user.id;` to add the user ID to the session user object, as `DefaultSession.user` doesn't explicitly include `id`.
+*   **Note:** This resolves the type error specifically within the NextAuth session callback.
+*   **Known Issue:** The build (`npm run build`) now fails with a different, unrelated error in `src/app/api/queue/process/route.ts` (`Type 'JsonValue' is not assignable to type 'JsonNull | InputJsonValue'`). This error needs separate investigation.
+
