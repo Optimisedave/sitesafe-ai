@@ -195,3 +195,13 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Note:** These changes resolve the type errors specifically within `src/app/api/auth/[...nextauth]/route.ts` that were preventing the build.
 *   **Known Issue:** The build (`npm run build`) now fails with a different, unrelated error in `src/app/api/queue/process/route.ts` (`Cannot find module 'next/server'`). This error was not present before and needs separate investigation.
 
+
+
+
+
+### v16 (2025-05-04)
+
+*   **Fix:** Resolved the `Cannot find module 'next/server'` build error encountered in v15 by changing `compilerOptions.moduleResolution` in `tsconfig.json` from `"nodenext"` to `"node"`.
+*   **Note:** Verified that `next-env.d.ts` exists and is included in `tsconfig.json`.
+*   **Known Issue:** While the `next/server` module resolution issue is fixed, the build (`npm run build`) now fails with a different type error in `src/app/api/auth/[...nextauth]/route.ts` related to the `CustomSession` type not being assignable to the expected `Session | DefaultSession` type in the `session` callback. This error emerged after changing `moduleResolution` and requires separate investigation.
+
