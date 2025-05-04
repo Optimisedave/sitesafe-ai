@@ -1,6 +1,6 @@
 
 import { getServerSession } from "next-auth/next";
-// Switched back to relative paths (Option B) for v8 due to tsconfigPaths not being supported
+// Switched back to relative paths (Option B) for v9 due to tsconfigPaths not being supported
 import { authOptions } from "../../lib/auth"; 
 import { redirect } from "next/navigation";
 import prisma from "../../lib/prisma";

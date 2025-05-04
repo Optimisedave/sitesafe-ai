@@ -117,3 +117,12 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Fix:** Removed invalid `compiler.tsconfigPaths` option from `next.config.js`.
 *   **Note:** Performed clean install (`rm -rf node_modules .next && npm install`) and `npx prisma generate`. Local build (`npm run build`) now compiles successfully, confirming the relative imports in the specified page/layout components are resolved. The build still fails during the linting/type-checking phase due to the pre-existing, unrelated type error (`Module '@prisma/client' has no exported member 'PrismaClient'`) in `src/app/api/auth/[...nextauth]/route.ts`.
 
+
+
+
+### v9 (2025-05-04)
+
+*   **Fix:** Removed `next.config.ts` and created `next.config.js`. Attempted Option A (`compiler.tsconfigPaths: true` in `next.config.js`) as requested, but build failed as this option is invalid for the Next.js version.
+*   **Fix:** Reverted to Option B. Updated `src/app/app/page.tsx` and `src/app/app/report/[id]/page.tsx` to use relative paths (`../../lib/...` and `../../../../lib/...` respectively) for `authOptions` and `prisma` imports. Verified `src/app/layout.tsx` uses relative path (`./globals.css`) for CSS import. Ensured `next.config.js` is minimal and does not contain invalid options.
+*   **Note:** Performed clean install (`rm -rf node_modules .next && npm install`) and `npx prisma generate`. Local build (`npm run build`) now compiles successfully for the page/layout components, confirming the relative imports are resolved. The build still fails during the linting/type-checking phase due to the pre-existing, unrelated type error (`Module '@prisma/client' has no exported member 'PrismaClient'`) in `src/app/api/auth/[...nextauth]/route.ts`.
+
