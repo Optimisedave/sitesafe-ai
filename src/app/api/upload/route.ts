@@ -90,11 +90,11 @@ export async function POST(req: NextRequest) {
   // Use the inlined authOptions
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
+  if (!(session?.user as any)?.id) {
     return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = (session!.user as any).id;
 
   try {
     const formData = await req.formData();

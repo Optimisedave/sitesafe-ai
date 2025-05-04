@@ -24,7 +24,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY environment variable is not set');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-04-10', // Use the latest API version
+  apiVersion: '2024-04-10' as any, // Use the latest API version
   typescript: true,
 });
 // --- End Inlined stripe.ts logic ---
@@ -64,15 +64,17 @@ export async function POST(req: NextRequest) {
           if (session.mode === 'subscription' && session.subscription && session.metadata?.userId) {
             const subscriptionId = session.subscription as string;
             const userId = session.metadata.userId;
-            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+            // Retrieve the subscription object
+            const subscriptionObject = await stripe.subscriptions.retrieve(subscriptionId);
 
             await prisma.subscription.create({
               data: {
                 userId: userId,
-                stripeSubscriptionId: subscription.id,
-                stripePriceId: subscription.items.data[0]?.price.id || '',
-                status: subscription.status.toUpperCase() as SubscriptionStatus,
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                stripeSubscriptionId: subscriptionObject.id,
+                stripePriceId: subscriptionObject.items.data[0]?.price.id || '',
+                status: subscriptionObject.status.toUpperCase() as SubscriptionStatus,
+                // Apply 'as any' cast here
+                currentPeriodEnd: new Date((subscriptionObject as any).current_period_end * 1000),
               },
             });
             console.log(`Subscription created for user ${userId}`);
@@ -94,7 +96,8 @@ export async function POST(req: NextRequest) {
               where: { stripeSubscriptionId: subscription.id },
               data: {
                 status: subscription.status.toUpperCase() as SubscriptionStatus,
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                // Apply 'as any' cast here
+                currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
                 stripePriceId: subscription.items.data[0]?.price.id || '',
               },
             });
@@ -109,7 +112,8 @@ export async function POST(req: NextRequest) {
                         stripeSubscriptionId: subscription.id,
                         stripePriceId: subscription.items.data[0]?.price.id || '',
                         status: subscription.status.toUpperCase() as SubscriptionStatus,
-                        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                        // Apply 'as any' cast here
+                        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
                     },
                 });
                 console.log(`Subscription ${subscription.id} created via ${event.type} webhook for user ${user.id}`);

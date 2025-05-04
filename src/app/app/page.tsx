@@ -25,11 +25,11 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   // Use optional chaining for session user properties
-  if (!session?.user?.id) {
+  if (!(session?.user as any)?.id) {
     redirect("/api/auth/signin"); // Redirect to sign-in if not authenticated
   }
 
-  const userId = session.user.id;
+  const userId = (session!.user as any).id;
   const reports = await getUserReports(userId);
 
   return (

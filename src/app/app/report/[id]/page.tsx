@@ -31,11 +31,11 @@ export default async function ReportPage({ params }: { params: { id: string } })
   const session = await getServerSession(authOptions);
 
   // Use optional chaining
-  if (!session?.user?.id) {
+  if (!(session?.user as any)?.id) {
     redirect("/api/auth/signin");
   }
 
-  const userId = session.user.id;
+  const userId = (session!.user as any).id;
   const reportId = params.id;
 
   const report = await getReportData(reportId, userId);

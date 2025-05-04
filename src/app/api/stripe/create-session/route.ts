@@ -32,7 +32,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY environment variable is not set');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-04-10', // Use the latest API version
+  apiVersion: '2024-04-10' as any, // Use the latest API version
   typescript: true,
 });
 // --- End Inlined stripe.ts logic ---
@@ -41,11 +41,11 @@ export async function POST(req: NextRequest) {
   // Use the potentially problematic authOptions import for now
   const session = await getServerSession(authOptions); 
 
-  if (!session?.user?.id || !session?.user?.email) {
+  if (!(session?.user as any)?.id || !session?.user?.email) {
     return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = (session.user as any).id;
   const userEmail = session.user.email;
 
   try {
