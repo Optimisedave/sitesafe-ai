@@ -256,3 +256,14 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Fix:** Addressed a related Stripe API version type error (`Type '"2024-04-10"' is not assignable to type '"2025-04-30.basil"'`) found in the original `src/lib/stripe.ts` file by casting the `apiVersion` to `any`. This aligns with the fixes applied to the inlined Stripe logic in API routes in v19.
 *   **Note:** With these changes, the build (`npm run build`) now successfully passes the compilation and type-checking phases. It fails later during page data collection due to missing Supabase environment variables (`Error: Supabase URL or service key is missing...`), which is expected in this environment and unrelated to the type errors fixed.
 
+
+
+
+
+### v21 (2025-05-04)
+
+*   **Build:** Updated `package.json` to ensure `prisma generate` runs during the Vercel build process as requested.
+    *   Modified the `build` script to: `"prisma generate && next build"`.
+    *   Added a `postinstall` script: `"postinstall": "prisma generate"`.
+*   **Note:** Local build verification (`npm run build`) confirms that `prisma generate` runs successfully before the `next build` command. The build passes compilation and type-checking, failing later only due to expected missing environment variables (Supabase) in this sandbox environment.
+
