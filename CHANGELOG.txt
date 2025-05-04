@@ -291,3 +291,15 @@ This update addressed Vercel build failures related to module resolution, ESLint
     *   Confirmed `.env.example` and `.env` include `SUPABASE_SERVICE_KEY` and deprecate `SUPABASE_ANON_KEY` with a comment.
 *   **Note:** No code changes were made in this version as the existing implementation from v22 already matched the user's requirements. Local build verification (`npm run build`) confirms the setup works correctly (passing compilation and type-checking, failing later only due to expected missing environment variables).
 
+
+
+
+
+### v24 (2025-05-04)
+
+*   **Refactor:** Updated Supabase client initialization in `src/app/api/queue/process/route.ts` based on ChatGPT feedback to potentially resolve Vercel environment variable issues.
+    *   The Supabase client is now initialized directly within this file using `process.env.SUPABASE_URL!` and `process.env.SUPABASE_SERVICE_KEY!`.
+    *   This replaces the previous inlined initialization logic in this file (which incorrectly used `SUPABASE_SERVICE_ROLE_KEY`) and avoids importing the client from `src/lib/supabase.ts`.
+*   **Verification:** Confirmed that `.env.example` and `.env` already contain the necessary `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` variables from previous updates (v22/v23).
+*   **Note:** Local build verification (`npm run build`) confirms the changes compile and pass type-checking. The build fails later during page data collection due to an expected "Invalid URL" error caused by placeholder values in the `.env` file (e.g., `[YOUR-SUPABASE-PROJECT-REF]`), which is unrelated to this specific code change.
+

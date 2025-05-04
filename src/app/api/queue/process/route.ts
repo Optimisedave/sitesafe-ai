@@ -20,14 +20,19 @@ if (process.env.NODE_ENV === 'production') {
 }
 // --- End Inlined prisma.ts logic ---
 
-// --- Inlined supabase.ts logic --- 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // Use service role key for backend operations
+// Load Supabase config from env
+const supabaseUrl = process.env.SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY!;
+
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Supabase URL or service key is missing in environment variables.');
+  throw new Error(
+    `Missing Supabase environment variables. ` +
+    `Expected SUPABASE_URL and SUPABASE_SERVICE_KEY.`
+  );
 }
+
+// Initialize client
 const supabase = createClient(supabaseUrl, supabaseKey);
-// --- End Inlined supabase.ts logic ---
 
 // --- Inlined openai.ts logic --- 
 const openaiApiKey = process.env.OPENAI_API_KEY;
