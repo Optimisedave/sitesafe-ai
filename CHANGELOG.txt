@@ -169,3 +169,14 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Note:** None of the import style changes resolved the `PrismaClient` type error during build. Reverted imports back to the standard direct style (`import { PrismaClient } from "@prisma/client";`).
 *   **Note:** The build still fails due to the unresolved `PrismaClient` type error in `src/app/api/auth/[...nextauth]/route.ts`. However, the webpack alias configuration for `@/` is confirmed working, and `@prisma/client` is now correctly listed under dependencies.
 
+
+
+
+
+### v14 (2025-05-04)
+
+*   **Fix:** Inlined Prisma client instantiation logic directly within `src/app/api/auth/[...nextauth]/route.ts` to resolve the persistent `PrismaClient` import/type errors encountered in v13. A separate `prismaAuth` instance is now created and used solely for the `PrismaAdapter` within this file, avoiding problematic cross-file imports.
+*   **Fix:** Updated type import in `src/app/api/auth/[...nextauth]/route.ts` from `AuthOptions` to `NextAuthOptions` (imported from `next-auth`).
+*   **Attempt:** Tried importing `User` and `Session` types from `next-auth` and `next-auth/types` in `src/app/api/auth/[...nextauth]/route.ts`, but both resulted in build errors (`Module '"next-auth"' has no exported member 'User'`, `Cannot find module 'next-auth/types'`). Reverted to importing directly from `next-auth` (`import type { User, Session } from "next-auth";`).
+*   **Known Issue:** The build still fails due to unresolved type errors for `User` and `Session` imports from `next-auth` in `src/app/api/auth/[...nextauth]/route.ts`. This issue persists despite trying different import paths. However, the core `PrismaClient` instantiation issue for the adapter has been resolved by inlining the client logic.
+

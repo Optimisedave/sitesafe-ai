@@ -1,14 +1,31 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth"; // Import only NextAuthOptions from here
+import type { User, Session } from "next-auth"; // Revert: Import User and Session types directly from next-auth
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import EmailProvider from "next-auth/providers/email";
-import { PrismaClient } from "@prisma/client"; // Reverted to direct import (best effort for v13)
-import { AuthOptions, User, Session } from "next-auth"; // Import AuthOptions, User, Session types
+// Removed import of shared prisma instance
 import { AdapterUser } from "next-auth/adapters"; // Import AdapterUser
+import { PrismaClient } from "@prisma/client"; // Import PrismaClient directly
+
+// --- Inlined Prisma Client Instantiation ---
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting your database connection limit.
+declare global {
+  // allow global `var` declarations
+  // eslint-disable-next-line no-var
+  var prismaAuthInstance: PrismaClient | undefined;
+}
+
+const prismaAuth =
+  global.prismaAuthInstance ||
+  new PrismaClient({
+    // log: ["query"], // Optional: enable logs if needed for debugging
+  });
+
+if (process.env.NODE_ENV !== "production") global.prismaAuthInstance = prismaAuth;
+// --- End of Inlined Prisma Client Instantiation ---
+
 
 // --- Inlined authOptions from src/lib/auth.ts --- 
-
-// Instantiate PrismaClient directly for the adapter within this file
-const prismaAuth = new PrismaClient();
 
 // Define a custom Session type if needed to include id and role
 interface CustomSession extends Session {
@@ -21,9 +38,10 @@ interface CustomSession extends Session {
   };
 }
 
-// Define authOptions directly in this file
-const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prismaAuth), // Use the locally instantiated client
+// Define authOptions directly in this file, using NextAuthOptions type
+const authOptions: NextAuthOptions = {
+  // Use the locally instantiated prismaAuth client
+  adapter: PrismaAdapter(prismaAuth), 
   providers: [
     EmailProvider({
       server: {
