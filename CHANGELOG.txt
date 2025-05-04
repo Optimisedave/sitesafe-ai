@@ -219,3 +219,16 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Note:** This resolves the type error specifically within the NextAuth session callback.
 *   **Known Issue:** The build (`npm run build`) now fails with a different, unrelated error in `src/app/api/queue/process/route.ts` (`Type 'JsonValue' is not assignable to type 'JsonNull | InputJsonValue'`). This error needs separate investigation.
 
+
+
+
+
+### v18 (2025-05-04)
+
+*   **Fix:** Resolved the `Prisma.JsonValue` type error in `src/app/api/queue/process/route.ts` encountered in v17.
+    *   Attempted to import and use `InputJsonValue` directly, but it was not exported from `@prisma/client`.
+    *   Attempted to use `Prisma.InputJsonValue`, but this resulted in a type conversion error.
+    *   Implemented the suggested fix by using a double type assertion: `(generatedResult.riskFlags ?? []) as unknown as Prisma.InputJsonValue`. This resolves the type error for the `riskFlags` field.
+*   **Note:** This resolves the type error specifically within the queue processing route.
+*   **Known Issue:** The build (`npm run build`) now fails with a different, unrelated error in `src/app/api/stripe/create-session/route.ts` related to an invalid Stripe API version (`Type '"2024-04-10"' is not assignable to type '"2025-04-30.basil"'`). This error needs separate investigation.
+

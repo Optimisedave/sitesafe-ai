@@ -233,7 +233,7 @@ async function generateReportForUpload(uploadId: string): Promise<void> {
         title: `Report for ${upload.filename} (${new Date().toISOString().split('T')[0]})`,
         summary: generatedResult.summary,
         fullReportMarkdown: generatedResult.fullReportMarkdown,
-        riskFlags: generatedResult.riskFlags as Prisma.JsonValue,
+        riskFlags: (generatedResult.riskFlags ?? []) as unknown as Prisma.InputJsonValue,
         sourceUploadIds: [upload.id],
       },
     });
