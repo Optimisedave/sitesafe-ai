@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import AuthProvider from "./providers"; // Import the AuthProvider
+import Header from "@/components/Header"; // Import the Header component
 
 export const metadata: Metadata = {
   title: "SiteSafe AI - Automated H&S Reporting", // Updated title
@@ -20,7 +21,10 @@ export default function RootLayout({
         className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}
       >
         <AuthProvider> {/* Wrap children with AuthProvider */} 
-          {children}
+          <Header /> {/* Add the Header component */} 
+          <main className="container mx-auto p-4"> {/* Add a main tag for content */} 
+            {children}
+          </main>
         </AuthProvider>
       </body>
     </html>
