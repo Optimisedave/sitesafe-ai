@@ -136,3 +136,12 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Fix:** Ensured `src/app/app/page.tsx` and `src/app/app/report/[id]/page.tsx` use relative paths (`../../lib/...` and `../../../../lib/...` respectively) for `authOptions` and `prisma` imports.
 *   **Note:** Performed clean install (`rm -rf node_modules .next && npm install`) and `npx prisma generate`. Local build (`npm run build`) compiles successfully for page/layout components, confirming relative imports are resolved. The build still fails during the linting/type-checking phase due to the pre-existing, unrelated type error (`Module '@prisma/client' has no exported member 'PrismaClient'`) in `src/app/api/auth/[...nextauth]/route.ts`.
 
+
+
+
+### v11 (2025-05-04)
+
+*   **Fix:** Implemented webpack alias in `next.config.js` to resolve `@/` to `src/` as requested, enabling alias imports.
+*   **Fix:** Restored alias imports (`@/lib/...`) in `src/app/app/page.tsx` and `src/app/app/report/[id]/page.tsx`.
+*   **Note:** Performed clean install (`rm -rf node_modules .next && npm install`) and `npx prisma generate`. Local build (`npm run build`) now compiles successfully with alias imports resolved via webpack config. The build still fails during the linting/type-checking phase due to the pre-existing, unrelated type error (`Module '@prisma/client' has no exported member 'PrismaClient'`) in `src/app/api/auth/[...nextauth]/route.ts`.
+

@@ -1,9 +1,9 @@
 
 import { getServerSession } from "next-auth/next";
-// Reverted to relative paths (Option B) - Corrected depth & re-verified for v10
-import { authOptions } from "../../../../lib/auth"; 
+// Restored alias imports (Option A - Webpack Alias) for v11
+import { authOptions } from "@/lib/auth"; 
 import { redirect } from "next/navigation";
-import prisma from "../../../../lib/prisma";
+import prisma from "@/lib/prisma";
 import ReportDisplay from "./report-display"; // Removed .tsx extension as it's often optional
 
 async function getReportData(reportId: string, userId: string) {

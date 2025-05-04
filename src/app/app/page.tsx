@@ -1,9 +1,9 @@
 
 import { getServerSession } from "next-auth/next";
-// Reverted to relative paths (Option B) for v10 as tsconfigPaths is not supported
-import { authOptions } from "../../lib/auth"; 
+// Restored alias imports (Option A - Webpack Alias) for v11
+import { authOptions } from "@/lib/auth"; 
 import { redirect } from "next/navigation";
-import prisma from "../../lib/prisma";
+import prisma from "@/lib/prisma";
 import Link from "next/link";
 
 // Helper function to fetch reports - could be moved to a service/lib file
