@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
 // Component to render the PDF document
 const ReportPDF = ({ report }: ReportDisplayProps) => {
   // Safely parse riskFlags, assuming it's an array of RiskFlag objects
-  const riskFlags = (Array.isArray(report.riskFlags) ? report.riskFlags : []) as RiskFlag[];
+  const riskFlags = (Array.isArray(report.riskFlags) ? report.riskFlags : []) as unknown as RiskFlag[];
 
   return (
     <Document>
@@ -157,7 +157,7 @@ const ReportDisplay = ({ report }: ReportDisplayProps) => {
   }, []);
 
   // Safely parse riskFlags for display
-  const riskFlags = (Array.isArray(report.riskFlags) ? report.riskFlags : []) as RiskFlag[];
+  const riskFlags = (Array.isArray(report.riskFlags) ? report.riskFlags : []) as unknown as RiskFlag[];
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
