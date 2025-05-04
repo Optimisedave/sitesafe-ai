@@ -267,3 +267,16 @@ This update addressed Vercel build failures related to module resolution, ESLint
     *   Added a `postinstall` script: `"postinstall": "prisma generate"`.
 *   **Note:** Local build verification (`npm run build`) confirms that `prisma generate` runs successfully before the `next build` command. The build passes compilation and type-checking, failing later only due to expected missing environment variables (Supabase) in this sandbox environment.
 
+
+
+
+
+### v22 (2025-05-04)
+
+*   **Refactor:** Updated Supabase client initialization in `src/lib/supabase.ts` to use the service role key (`SUPABASE_SERVICE_KEY`) instead of the anonymous key (`SUPABASE_ANON_KEY`) as requested.
+    *   The client now uses `process.env.SUPABASE_SERVICE_KEY!`.
+    *   Updated the error message to reflect the change.
+*   **Config:** Added `SUPABASE_SERVICE_KEY="<your service role key>"` to `.env.example` and `.env` files.
+    *   Added comments to `.env.example` and `.env` indicating that `SUPABASE_ANON_KEY` is no longer used by the default client.
+*   **Note:** Local build verification (`npm run build`) confirms that the changes do not introduce new compilation or type errors. The build passes compilation and type-checking, failing later only due to expected missing environment variables (Supabase) in this sandbox environment.
+
