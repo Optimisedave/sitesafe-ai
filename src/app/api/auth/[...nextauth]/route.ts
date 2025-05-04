@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import EmailProvider from "next-auth/providers/email";
-import { PrismaClient } from "@prisma/client"; // Import PrismaClient directly
+import { PrismaClient } from "@prisma/client"; // Reverted to direct import (best effort for v13)
 import { AuthOptions, User, Session } from "next-auth"; // Import AuthOptions, User, Session types
 import { AdapterUser } from "next-auth/adapters"; // Import AdapterUser
 

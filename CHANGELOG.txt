@@ -156,3 +156,16 @@ This update addressed Vercel build failures related to module resolution, ESLint
 *   **Verification:** Local build (`npm run build`) compiles successfully for page/layout components with alias imports resolved via webpack config (ignoring known PrismaClient type error).
 *   **Note:** This version is a re-verification and repackaging of v11 to ensure the correct configuration is delivered.
 
+
+
+
+### v13 (2025-05-04)
+
+*   **Fix:** Moved `@prisma/client` from `devDependencies` to `dependencies` in `package.json` as requested.
+*   **Attempt:** Tried multiple import styles for `PrismaClient` in `src/lib/prisma.ts` and `src/app/api/auth/[...nextauth]/route.ts` to resolve build type error (`Module '"@prisma/client"' has no exported member 'PrismaClient'`), including:
+    *   CommonJS-style (`import pkg from ...; const { PrismaClient } = pkg;`)
+    *   Alternative default (`import Prisma from ...; const { PrismaClient } = Prisma;`)
+    *   Direct path (`import { PrismaClient } from ".prisma/client/default";`)
+*   **Note:** None of the import style changes resolved the `PrismaClient` type error during build. Reverted imports back to the standard direct style (`import { PrismaClient } from "@prisma/client";`).
+*   **Note:** The build still fails due to the unresolved `PrismaClient` type error in `src/app/api/auth/[...nextauth]/route.ts`. However, the webpack alias configuration for `@/` is confirmed working, and `@prisma/client` is now correctly listed under dependencies.
+
